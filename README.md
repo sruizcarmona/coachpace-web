@@ -1,2 +1,2 @@
-# pacelab
+# coachpace
 ai training telegram coach
