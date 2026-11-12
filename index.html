@@ -3,707 +3,668 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pacelab — AI Training Coach</title>
-<meta name="description" content="Pacelab is your AI-powered training coach on Telegram. Sync with Strava, get personalized AI training plans, and chat with your coach — all in Telegram.">
-<meta property="og:title" content="Pacelab — AI Training Coach">
-<meta property="og:description" content="Your AI-powered training coach on Telegram. Strava integration, personalized plans, and conversational coaching.">
-<meta property="og:image" content="https://raw.githubusercontent.com/sruizcarmona/pacelab-web/201929e0f4a892942cd6bc28caf40cd5bb256078/logo_pacelab.png">
+<title>CoachPace: AI running coach on Telegram</title>
+<meta name="description" content="CoachPace reads your Strava activities, writes a seven-day running plan, and adjusts it in Telegram when you miss a session. Free to start, Pro at $9 per month.">
+<meta property="og:title" content="CoachPace: AI running coach on Telegram">
+<meta property="og:description" content="Reads your Strava runs, writes the next seven days, and rewrites the week when you miss a session.">
+<meta property="og:image" content="https://raw.githubusercontent.com/sruizcarmona/coachpace-web/main/logo_coachpace.png">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#0a0e1a">
-<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/sruizcarmona/pacelab-web/201929e0f4a892942cd6bc28caf40cd5bb256078/logo_pacelab.png">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#f4f1ea">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
-    --bg-primary: #0a0e1a;
-    --bg-secondary: #0f172a;
-    --bg-card: #111d35;
-    --bg-elevated: #1a2a4a;
-    --gold: #d4a843;
-    --gold-light: #e8c76a;
-    --turquoise: #2dd4bf;
-    --turquoise-dark: #1a9e8e;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --border: #1e3a5f;
-    --gradient-gold: linear-gradient(135deg, #d4a843, #e8c76a);
-    --gradient-turquoise: linear-gradient(135deg, #2dd4bf, #4ae0d0);
-    --shadow: 0 4px 24px rgba(0,0,0,.4);
-    --radius: 12px;
-    --radius-lg: 20px;
-    --max-width: 1100px;
-    --nav-height: 70px;
-    --transition: .3s cubic-bezier(.4,0,.2,1);
+    --paper: #f4f1ea;
+    --ink: #16150f;
+    --ink-soft: #3b3a33;
+    --ink-faint: #6b685d;
+    --rule: #d3cec0;
+    --accent: #b23a13;
+    --max-width: 1120px;
+    --nav-height: 72px;
+    --ease: cubic-bezier(.2, .6, .2, 1);
   }
+
   html { scroll-behavior: smooth; }
+
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    line-height: 1.6;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
+
+  h1, h2, h3, h4 {
+    font-family: "Bricolage Grotesque", Georgia, serif;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
   a { color: inherit; text-decoration: none; }
-  img { max-width: 100%; height: auto; display: block; }
+  img { display: block; max-width: 100%; height: auto; }
   ul { list-style: none; }
+  button { font: inherit; }
 
-  .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
+  .wrap { max-width: var(--max-width); margin: 0 auto; padding: 0 32px; }
+
+  .skip {
+    position: absolute; left: -9999px; top: 0; z-index: 200;
+    background: var(--ink); color: var(--paper); padding: 12px 18px;
+  }
+  .skip:focus { left: 16px; top: 16px; }
+
+  /* ===== BUTTONS ===== */
   .btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 12px 28px; border-radius: 50px; border: none;
-    font-size: 1rem; font-weight: 600; cursor: pointer;
-    transition: var(--transition); white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 15px 26px; border: 1px solid var(--ink);
+    font-size: 1rem; font-weight: 600; line-height: 1;
+    background: var(--ink); color: var(--paper);
+    cursor: pointer; transition: background .18s var(--ease), color .18s var(--ease), border-color .18s var(--ease);
   }
-  .btn-primary {
-    background: var(--gradient-gold); color: #0a0e1a; box-shadow: 0 4px 20px rgba(212,168,67,.3);
-  }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(212,168,67,.45); }
-  .btn-outline {
-    background: transparent; color: var(--gold); border: 2px solid var(--gold);
-  }
-  .btn-outline:hover { background: rgba(212,168,67,.1); }
+  .btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn .arrow { transition: transform .18s var(--ease); }
+  .btn:hover .arrow { transform: translateX(4px); }
+  .btn-ghost { background: transparent; color: var(--ink); }
+  .btn-ghost:hover { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 
-  .section { padding: 100px 0; }
-  .section-label {
-    display: inline-block; font-size: .8rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 2px; color: var(--gold); margin-bottom: 12px;
-  }
-  .section-title {
-    font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.2;
-    margin-bottom: 16px;
-  }
-  .section-subtitle {
-    font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; line-height: 1.7;
-  }
-
-  /* ===== NAVBAR ===== */
+  /* ===== NAV ===== */
   .navbar {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-    height: var(--nav-height); display: flex; align-items: center;
-    transition: var(--transition);
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(244, 241, 234, .94);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid transparent;
+    transition: border-color .2s var(--ease);
   }
-  .navbar.scrolled { background: rgba(10,14,26,.92); backdrop-filter: blur(12px); box-shadow: 0 1px 0 var(--border); }
-  .navbar .container {
-    display: flex; align-items: center; justify-content: space-between; width: 100%;
+  .navbar.scrolled { border-bottom-color: var(--rule); }
+  .navbar .wrap {
+    height: var(--nav-height);
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
   }
-  .nav-logo {
-    display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 800;
+  .brand {
+    display: flex; align-items: center; gap: 11px;
+    font-family: "Bricolage Grotesque", Georgia, serif;
+    font-size: 1.32rem; font-weight: 700; letter-spacing: -0.03em;
   }
-  .nav-logo img { width: 36px; height: 36px; border-radius: 8px; }
-  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .brand svg { flex-shrink: 0; }
+  .nav-links { display: flex; align-items: center; gap: 30px; }
   .nav-links a {
-    font-size: .9rem; font-weight: 500; color: var(--text-secondary);
-    transition: var(--transition); position: relative;
+    font-size: .94rem; font-weight: 500; color: var(--ink-soft);
+    transition: color .18s var(--ease);
   }
-  .nav-links a::after {
-    content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
-    height: 2px; background: var(--gold); transform: scaleX(0); transition: var(--transition);
+  .nav-links a:hover { color: var(--ink); }
+  .nav-links a.nav-link { position: relative; padding: 4px 0; }
+  .nav-links a.nav-link::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -2px;
+    height: 1px; background: var(--ink);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .2s var(--ease);
   }
-  .nav-links a:hover { color: var(--text-primary); }
-  .nav-links a:hover::after { transform: scaleX(1); }
-  .nav-cta { padding: 10px 22px; font-size: .9rem; }
+  .nav-links a.nav-link:hover::after { transform: scaleX(1); }
+  .nav-cta { padding: 11px 18px; font-size: .9rem; }
+  .nav-links a.nav-cta { color: var(--paper); }
+  .nav-links a.nav-cta:hover { color: #fff; }
   .nav-toggle {
-    display: none; flex-direction: column; gap: 5px; cursor: pointer;
-    background: none; border: none; padding: 4px;
+    display: none; flex-direction: column; justify-content: center; gap: 5px;
+    width: 40px; height: 40px; padding: 0; background: none; border: 0; cursor: pointer;
   }
   .nav-toggle span {
-    display: block; width: 26px; height: 2.5px; background: var(--text-primary);
-    border-radius: 2px; transition: var(--transition);
+    display: block; width: 24px; height: 1.5px; background: var(--ink);
+    transition: transform .2s var(--ease), opacity .2s var(--ease);
   }
-  .nav-toggle.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+  .nav-toggle.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
   .nav-toggle.open span:nth-child(2) { opacity: 0; }
-  .nav-toggle.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+  .nav-toggle.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
   /* ===== HERO ===== */
-  .hero {
-    min-height: 100vh; display: flex; align-items: center; position: relative;
-    overflow: hidden; padding-top: var(--nav-height);
+  .hero { padding: 76px 0 96px; }
+  .hero-grid {
+    display: grid; grid-template-columns: 1.05fr .95fr;
+    gap: clamp(32px, 6vw, 76px); align-items: center;
   }
-  .hero::before {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(45,212,191,.06) 0%, transparent 70%),
-                radial-gradient(ellipse 60% 50% at 80% 100%, rgba(212,168,67,.04) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .hero .container { position: relative; display: flex; align-items: center; gap: 60px; }
-  .hero-content { flex: 1; }
-  .hero-logo { width: 80px; height: 80px; border-radius: 16px; margin-bottom: 24px; }
   .hero h1 {
-    font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 900; line-height: 1.1; margin-bottom: 20px;
+    font-size: clamp(2.7rem, 5.6vw, 4.6rem);
+    line-height: .98;
+    letter-spacing: -0.035em;
+    max-width: 13ch;
   }
-  .hero h1 .highlight {
-    background: var(--gradient-gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .hero-sub {
+    margin-top: 26px; max-width: 44ch;
+    font-size: 1.12rem; color: var(--ink-soft);
   }
-  .hero p {
-    font-size: 1.2rem; color: var(--text-secondary); max-width: 520px;
-    line-height: 1.7; margin-bottom: 36px;
+  .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+  .hero-facts {
+    display: flex; flex-wrap: wrap; align-items: center;
+    margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--rule);
+    font-size: .86rem; color: var(--ink-faint);
   }
-  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
-  .hero-visual { flex: 1; display: flex; justify-content: center; position: relative; }
-  .hero-phone {
-    width: 320px; background: var(--bg-card); border-radius: 24px; border: 1px solid var(--border);
-    overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  .hero-facts span + span::before {
+    content: "/"; color: var(--rule); margin: 0 12px;
   }
-  .phone-header {
-    display: flex; align-items: center; gap: 8px; padding: 14px 16px;
-    background: var(--bg-elevated); border-bottom: 1px solid var(--border);
+  .hero-figure { position: relative; }
+  .hero-figure img {
+    width: 100%; aspect-ratio: 4 / 5; object-fit: cover;
+    object-position: 58% 50%;
   }
-  .phone-dots { display: flex; gap: 6px; }
-  .phone-dots span { width: 10px; height: 10px; border-radius: 50%; }
-  .phone-dots span:nth-child(1) { background: #ef4444; }
-  .phone-dots span:nth-child(2) { background: #eab308; }
-  .phone-dots span:nth-child(3) { background: #22c55e; }
-  .phone-title { flex: 1; text-align: center; font-size: .85rem; font-weight: 600; }
-  .phone-chat { padding: 12px; display: flex; flex-direction: column; gap: 10px; min-height: 380px; }
-  .chat-bubble {
-    max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: .85rem; line-height: 1.45;
-    animation: fadeUp .5s ease backwards;
+  .hero-figure figcaption {
+    margin-top: 10px; font-size: .8rem; color: var(--ink-faint);
+    display: flex; justify-content: space-between; gap: 16px;
   }
-  .chat-bubble.bot {
-    align-self: flex-start; background: var(--bg-elevated);
-    border-bottom-left-radius: 4px;
-  }
-  .chat-bubble.bot .chat-name {
-    font-size: .7rem; font-weight: 700; color: var(--turquoise); margin-bottom: 4px;
-  }
-  .chat-bubble.user {
-    align-self: flex-end; background: var(--gold); color: #0a0e1a;
-    border-bottom-right-radius: 4px;
-  }
-  .chat-bubble:nth-child(1) { animation-delay: .2s; }
-  .chat-bubble:nth-child(2) { animation-delay: .6s; }
-  .chat-bubble:nth-child(3) { animation-delay: 1s; }
-  .chat-bubble:nth-child(4) { animation-delay: 1.4s; }
-  .chat-typing {
-    align-self: flex-start; display: flex; gap: 4px; padding: 8px 14px;
-    background: var(--bg-elevated); border-radius: 14px; border-bottom-left-radius: 4px;
-    animation: fadeUp .5s 1.8s backwards;
-  }
-  .chat-typing span {
-    width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted);
-    animation: bounce 1.4s infinite;
-  }
-  .chat-typing span:nth-child(2) { animation-delay: .2s; }
-  .chat-typing span:nth-child(3) { animation-delay: .4s; }
 
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+  /* ===== SECTIONS ===== */
+  .section { padding: 92px 0; border-top: 1px solid var(--rule); }
+  section[id] { scroll-margin-top: var(--nav-height); }
+  .section h2 {
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    line-height: 1.04;
+    max-width: 20ch;
+  }
+  .section-intro {
+    margin-top: 20px; max-width: 46ch;
+    color: var(--ink-soft); font-size: 1.05rem;
+  }
 
-  /* ===== FEATURES ===== */
-  .features { background: var(--bg-secondary); }
-  .features-header { text-align: center; margin-bottom: 60px; }
-  .features-header .section-subtitle { margin: 0 auto; }
-  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-  .feature-card {
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-    padding: 36px 28px; transition: var(--transition); position: relative; overflow: hidden;
+  /* ===== THE WEEK ===== */
+  .week-grid {
+    display: grid; grid-template-columns: .82fr 1.18fr;
+    gap: clamp(32px, 6vw, 72px); align-items: start;
   }
-  .feature-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    transform: scaleX(0); transition: var(--transition);
-  }
-  .feature-card:nth-child(1)::before { background: var(--gradient-gold); }
-  .feature-card:nth-child(2)::before { background: var(--gradient-turquoise); }
-  .feature-card:nth-child(3)::before { background: linear-gradient(135deg, #d4a843, #2dd4bf); }
-  .feature-card:hover { transform: translateY(-6px); border-color: rgba(212,168,67,.3); }
-  .feature-card:hover::before { transform: scaleX(1); }
-  .feature-icon {
-    width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
-    font-size: 1.6rem; margin-bottom: 20px;
-  }
-  .feature-card:nth-child(1) .feature-icon { background: rgba(212,168,67,.15); }
-  .feature-card:nth-child(2) .feature-icon { background: rgba(45,212,191,.15); }
-  .feature-card:nth-child(3) .feature-icon { background: rgba(212,168,67,.1); }
-  .feature-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 10px; }
-  .feature-card p { color: var(--text-secondary); font-size: .95rem; line-height: 1.65; }
+  .week-aside { position: sticky; top: calc(var(--nav-height) + 32px); }
+  .week-photo { margin-top: 34px; }
+  .week-photo img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .week-photo figcaption { margin-top: 10px; font-size: .8rem; color: var(--ink-faint); }
 
-  /* ===== HOW IT WORKS ===== */
-  .how-header { text-align: center; margin-bottom: 60px; }
-  .how-header .section-subtitle { margin: 0 auto; }
-  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; position: relative; }
-  .steps::before {
-    content: ''; position: absolute; top: 32px; left: 12%; right: 12%;
-    height: 2px; background: linear-gradient(90deg, var(--gold), var(--turquoise), var(--gold));
-    opacity: .3;
+  .week-list { border-top: 1px solid var(--ink); }
+  .week-row {
+    display: grid; grid-template-columns: 78px minmax(0, 1fr) auto;
+    align-items: baseline; gap: 20px;
+    padding: 19px 0; border-bottom: 1px solid var(--rule);
   }
-  .step {
-    text-align: center; position: relative; z-index: 1;
+  .week-day {
+    font-size: .76rem; font-weight: 600; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--ink-faint);
   }
-  .step-number {
-    width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 20px; font-size: 1.3rem; font-weight: 800;
-    background: var(--bg-card); border: 2px solid var(--border); color: var(--gold);
-    transition: var(--transition);
+  .week-session { font-size: 1.06rem; font-weight: 600; }
+  .week-detail { font-size: .9rem; color: var(--ink-soft); text-align: right; }
+  .week-rest .week-session { color: var(--ink-faint); font-weight: 500; }
+  .week-note {
+    margin-top: 18px; font-size: .86rem; color: var(--ink-faint); max-width: 54ch;
   }
-  .step:hover .step-number { border-color: var(--gold); box-shadow: 0 0 30px rgba(212,168,67,.2); }
-  .step h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
-  .step p { color: var(--text-secondary); font-size: .9rem; line-height: 1.6; }
 
-  /* ===== PREVIEW ===== */
-  .preview { background: var(--bg-secondary); }
-  .preview-header { text-align: center; margin-bottom: 60px; }
-  .preview-header .section-subtitle { margin: 0 auto; }
-  .preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-  .preview-card {
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-    overflow: hidden; transition: var(--transition);
+  /* ===== WHAT IT READS ===== */
+  .reads-grid {
+    display: grid; grid-template-columns: .82fr 1.18fr;
+    gap: clamp(32px, 6vw, 72px); align-items: start;
   }
-  .preview-card:hover { transform: translateY(-4px); border-color: rgba(45,212,191,.3); }
-  .preview-card-img {
-    height: 240px; display: flex; align-items: center; justify-content: center;
-    font-size: .9rem; color: var(--text-muted); position: relative; overflow: hidden;
+  .reads-list { border-top: 1px solid var(--ink); }
+  .reads-row {
+    display: grid; grid-template-columns: 160px minmax(0, 1fr);
+    gap: 24px; padding: 20px 0; border-bottom: 1px solid var(--rule);
   }
-  .preview-card-img .mock-chat {
-    position: absolute; inset: 0; padding: 24px 20px; display: flex; flex-direction: column; gap: 8px;
+  .reads-row dt { font-weight: 600; font-size: .95rem; }
+  .reads-row dd { color: var(--ink-soft); font-size: .95rem; }
+  .reads-note {
+    margin-top: 18px; font-size: .86rem; color: var(--ink-faint); max-width: 54ch;
   }
-  .preview-card-img .mock-msg {
-    padding: 8px 12px; border-radius: 10px; font-size: .75rem; max-width: 85%; line-height: 1.4;
-  }
-  .preview-card-img .mock-msg.left { align-self: flex-start; background: var(--bg-elevated); }
-  .preview-card-img .mock-msg.right { align-self: flex-end; background: var(--gold); color: #0a0e1a; }
-  .preview-card-img .mock-msg .hl { color: var(--gold); font-weight: 600; }
-  .preview-card-img .mock-msg.right .hl { color: #0a0e1a; }
-  .preview-card-body { padding: 24px; }
-  .preview-card-body h4 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
-  .preview-card-body p { color: var(--text-secondary); font-size: .85rem; line-height: 1.6; }
 
   /* ===== PRICING ===== */
-  .pricing-header { text-align: center; margin-bottom: 60px; }
-  .pricing-header .section-subtitle { margin: 0 auto; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; align-items: start; }
-  .pricing-card {
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-    padding: 40px 32px; transition: var(--transition); position: relative;
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 28px; margin-top: 46px;
   }
-  .pricing-card.featured {
-    border-color: var(--gold); transform: scale(1.04); background: var(--bg-elevated);
+  .plan {
+    border: 1px solid var(--rule);
+    padding: 34px 32px 32px;
+    display: flex; flex-direction: column;
   }
-  .pricing-card.featured .pricing-badge {
-    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-    background: var(--gradient-gold); color: #0a0e1a; padding: 4px 18px; border-radius: 50px;
-    font-size: .8rem; font-weight: 700;
+  .plan-name { font-size: 1.05rem; font-weight: 600; }
+  .plan-price {
+    font-family: "Bricolage Grotesque", Georgia, serif;
+    font-size: 3.1rem; font-weight: 700; letter-spacing: -0.04em;
+    line-height: 1; margin: 14px 0 12px;
   }
-  .pricing-card:hover { transform: translateY(-6px); border-color: rgba(212,168,67,.3); }
-  .pricing-card.featured:hover { transform: scale(1.04) translateY(-6px); }
-  .pricing-name { font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); margin-bottom: 8px; }
-  .pricing-price { font-size: 2.8rem; font-weight: 900; margin-bottom: 4px; }
-  .pricing-price span { font-size: 1rem; font-weight: 500; color: var(--text-muted); }
-  .pricing-desc { color: var(--text-secondary); font-size: .9rem; margin-bottom: 28px; }
-  .pricing-features { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
-  .pricing-features li {
-    display: flex; align-items: center; gap: 10px; font-size: .9rem; color: var(--text-secondary);
+  .plan-price span {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: .9rem; font-weight: 500; letter-spacing: 0;
+    color: var(--ink-faint); margin-left: 4px;
   }
-  .pricing-features li .check { color: var(--turquoise); font-weight: 700; }
-  .pricing-card .btn { width: 100%; justify-content: center; }
+  .plan-desc { color: var(--ink-soft); font-size: .95rem; min-height: 3.2em; }
+  .plan-features {
+    margin: 24px 0 30px; display: flex; flex-direction: column; gap: 11px;
+    border-top: 1px solid var(--rule); padding-top: 22px;
+  }
+  .plan-features li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: .93rem; color: var(--ink-soft);
+  }
+  .plan-features svg { flex-shrink: 0; margin-top: 5px; color: var(--accent); }
+  .plan .btn { width: 100%; justify-content: center; margin-top: auto; }
+  .pricing-note { margin-top: 22px; font-size: .86rem; color: var(--ink-faint); }
 
   /* ===== FAQ ===== */
-  .faq-header { text-align: center; margin-bottom: 60px; }
-  .faq-header .section-subtitle { margin: 0 auto; }
-  .faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
-  .faq-item {
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
-    overflow: hidden; transition: var(--transition);
+  .faq-grid {
+    display: grid; grid-template-columns: .82fr 1.18fr;
+    gap: clamp(32px, 6vw, 72px); align-items: start;
   }
-  .faq-item:hover { border-color: rgba(212,168,67,.2); }
+  .faq-list { border-top: 1px solid var(--ink); }
+  .faq-item { border-bottom: 1px solid var(--rule); }
   .faq-question {
-    width: 100%; display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 24px; background: none; border: none; color: var(--text-primary);
-    font-size: 1rem; font-weight: 600; cursor: pointer; text-align: left;
-    transition: var(--transition);
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    padding: 20px 0; background: none; border: 0; cursor: pointer;
+    text-align: left; font-size: 1rem; font-weight: 600; color: var(--ink);
+    transition: color .18s var(--ease);
   }
-  .faq-question:hover { color: var(--gold); }
-  .faq-question .icon {
-    font-size: 1.2rem; transition: var(--transition); flex-shrink: 0;
-  }
-  .faq-item.open .faq-question .icon { transform: rotate(45deg); }
+  .faq-question:hover { color: var(--accent); }
+  .faq-question svg { flex-shrink: 0; transition: transform .22s var(--ease); }
+  .faq-item.open .faq-question svg { transform: rotate(45deg); }
   .faq-answer {
-    max-height: 0; overflow: hidden; transition: max-height .4s ease, padding .4s ease;
-    padding: 0 24px;
+    display: grid; grid-template-rows: 0fr;
+    transition: grid-template-rows .28s var(--ease);
   }
-  .faq-item.open .faq-answer {
-    max-height: 200px; padding: 0 24px 20px;
+  .faq-answer > div { overflow: hidden; }
+  .faq-item.open .faq-answer { grid-template-rows: 1fr; }
+  .faq-answer p {
+    padding: 0 0 22px; max-width: 62ch;
+    color: var(--ink-soft); font-size: .95rem;
   }
-  .faq-answer p { color: var(--text-secondary); font-size: .95rem; line-height: 1.7; }
 
   /* ===== FOOTER ===== */
-  .footer {
-    border-top: 1px solid var(--border); padding: 48px 0;
+  .footer { border-top: 1px solid var(--rule); padding: 54px 0 40px; }
+  .footer-top { display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+  .footer-brand p {
+    margin-top: 12px; max-width: 34ch;
+    font-size: .9rem; color: var(--ink-faint);
   }
-  .footer-content {
-    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px;
+  .footer-links { display: flex; gap: 26px; flex-wrap: wrap; align-items: flex-start; }
+  .footer-links a {
+    font-size: .9rem; color: var(--ink-soft);
+    transition: color .18s var(--ease);
   }
-  .footer-logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; }
-  .footer-logo img { width: 28px; height: 28px; border-radius: 6px; }
-  .footer-links { display: flex; align-items: center; gap: 24px; }
-  .footer-links a { color: var(--text-muted); font-size: .9rem; transition: var(--transition); }
-  .footer-links a:hover { color: var(--gold); }
-  .footer-copy { color: var(--text-muted); font-size: .85rem; }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-bottom {
+    display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--rule);
+    font-size: .82rem; color: var(--ink-faint);
+  }
 
   /* ===== RESPONSIVE ===== */
-  @media (max-width: 900px) {
-    .nav-links { display: none; }
-    .nav-toggle { display: flex; }
-    .nav-links.open {
-      display: flex; flex-direction: column; position: absolute; top: var(--nav-height);
-      left: 0; right: 0; background: rgba(10,14,16,.98); backdrop-filter: blur(12px);
-      padding: 24px; gap: 20px; border-bottom: 1px solid var(--border);
+  @media (max-width: 960px) {
+    .nav-links {
+      display: none;
+      position: absolute; top: var(--nav-height); left: 0; right: 0;
+      flex-direction: column; align-items: stretch; gap: 0;
+      background: var(--paper); border-bottom: 1px solid var(--rule);
+      padding: 8px 32px 24px;
     }
-    .hero .container { flex-direction: column; text-align: center; padding-top: 40px; }
-    .hero p { margin: 0 auto 36px; }
-    .hero-actions { justify-content: center; }
-    .hero-visual { display: none; }
-    .features-grid { grid-template-columns: 1fr; }
-    .steps { grid-template-columns: 1fr 1fr; }
-    .steps::before { display: none; }
-    .preview-grid { grid-template-columns: 1fr; }
-    .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
-    .pricing-card.featured { transform: none; }
-    .pricing-card.featured:hover { transform: translateY(-6px); }
-    .footer-content { flex-direction: column; text-align: center; }
+    .nav-links.open { display: flex; }
+    .nav-links a.nav-link { padding: 14px 0; border-bottom: 1px solid var(--rule); }
+    .nav-links a.nav-link::after { display: none; }
+    .nav-links .nav-cta { margin-top: 18px; justify-content: center; }
+    .nav-toggle { display: flex; }
+
+    .hero { padding: 44px 0 72px; }
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero h1 { max-width: 16ch; }
+    .hero-figure { order: 2; }
+    .hero-figure img { aspect-ratio: 4 / 3; }
+    .hero-facts { margin-top: 34px; }
+
+    .section { padding: 68px 0; }
+    .week-grid, .reads-grid, .faq-grid { grid-template-columns: 1fr; gap: 34px; }
+    .week-aside { position: static; }
+    .week-photo img { aspect-ratio: 16 / 9; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .plan-desc { min-height: 0; }
   }
-  @media (max-width: 600px) {
-    .steps { grid-template-columns: 1fr; gap: 36px; }
-    .section { padding: 60px 0; }
-    .hero { min-height: auto; padding-bottom: 60px; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 0 20px; }
+    .nav-links { padding: 8px 20px 24px; }
+    .hero h1 { font-size: clamp(2.35rem, 11vw, 3.1rem); }
+    .hero-facts { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .hero-facts span + span::before { display: none; }
+    .week-row { grid-template-columns: 58px minmax(0, 1fr); gap: 8px 14px; }
+    .week-detail { grid-column: 2; text-align: left; }
+    .reads-row { grid-template-columns: 1fr; gap: 4px; }
+    .plan { padding: 28px 22px; }
+    .footer-bottom { flex-direction: column; gap: 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      transition-duration: .01ms !important;
+    }
   }
 </style>
 </head>
 <body>
 
-<!-- ===== NAVBAR ===== -->
+<a class="skip" href="#main">Skip to content</a>
+
 <nav class="navbar" id="navbar">
-  <div class="container">
-    <a href="#" class="nav-logo">
-      <img src="https://raw.githubusercontent.com/sruizcarmona/pacelab-web/201929e0f4a892942cd6bc28caf40cd5bb256078/logo_pacelab.png" alt="Pacelab">
-      Pacelab
+  <div class="wrap">
+    <a href="#" class="brand" aria-label="CoachPace home">
+      <svg width="30" height="28" viewBox="0 0 30 28" fill="none" aria-hidden="true">
+        <path d="M1 2 L12 14 L1 26" stroke="currentColor" stroke-width="2"/>
+        <path d="M10 2 L21 14 L10 26" stroke="currentColor" stroke-width="2.8"/>
+        <path d="M19 2 L30 14 L19 26" stroke="#b23a13" stroke-width="3.6"/>
+      </svg>
+      CoachPace
     </a>
     <div class="nav-links" id="navLinks">
-      <a href="#features">Features</a>
-      <a href="#how">How It Works</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#faq">FAQ</a>
-      <a href="http://t.me/pacelab_bot" class="btn btn-primary nav-cta" target="_blank" rel="noopener">Start on Telegram</a>
+      <a href="#week" class="nav-link">The week</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="#faq" class="nav-link">FAQ</a>
+      <a href="http://t.me/pacelab_bot" class="btn nav-cta" target="_blank" rel="noopener">Open in Telegram</a>
     </div>
-    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
       <span></span><span></span><span></span>
     </button>
   </div>
 </nav>
 
-<!-- ===== HERO ===== -->
-<section class="hero" id="hero">
-  <div class="container">
-    <div class="hero-content">
-      <img src="https://raw.githubusercontent.com/sruizcarmona/pacelab-web/201929e0f4a892942cd6bc28caf40cd5bb256078/logo_pacelab.png" alt="Pacelab" class="hero-logo">
-      <h1>Your <span class="highlight">AI Training Coach</span></h1>
-      <p>Personalized AI-powered training plans, seamless Strava integration, and conversational coaching — all inside Telegram.</p>
-      <div class="hero-actions">
-        <a href="http://t.me/pacelab_bot" class="btn btn-primary" target="_blank" rel="noopener">Start on Telegram &rarr;</a>
-        <a href="#features" class="btn btn-outline">Learn More</a>
-      </div>
-    </div>
-    <div class="hero-visual">
-      <div class="hero-phone">
-        <div class="phone-header">
-          <div class="phone-dots"><span></span><span></span><span></span></div>
-          <div class="phone-title">Pacelab</div>
-          <div style="width:44px"></div>
-        </div>
-        <div class="phone-chat">
-          <div class="chat-bubble bot">
-            <div class="chat-name">Pacelab Coach</div>
-            Welcome back! I've analyzed your last 3 runs. Your endurance is improving &mdash; ready for this week's plan?
+<main id="main">
+
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <h1>Turn your Strava runs into next week’s plan.</h1>
+          <p class="hero-sub">CoachPace reads the activities you already log, writes your next seven days session by session, and rewrites the week when life gets in the way. It lives in Telegram, so there is nothing to install.</p>
+          <div class="hero-actions">
+            <a href="http://t.me/pacelab_bot" class="btn" target="_blank" rel="noopener">Open in Telegram <span class="arrow" aria-hidden="true">&rarr;</span></a>
+            <a href="#week" class="btn btn-ghost">See a sample week</a>
           </div>
-          <div class="chat-bubble user">Yes, let's see it!</div>
-          <div class="chat-bubble bot">
-            <div class="chat-name">Pacelab Coach</div>
-            Great! Here's your personalized plan. Monday: 5K easy pace, Tuesday: intervals 4x800m, Thursday: tempo run, Saturday: long run 12K.
-          </div>
-          <div class="chat-bubble user">Looks good, thanks!</div>
-          <div class="chat-typing"><span></span><span></span><span></span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== FEATURES ===== -->
-<section class="section features" id="features">
-  <div class="container">
-    <div class="features-header">
-      <span class="section-label">Features</span>
-      <h2 class="section-title">Everything you need to train smarter</h2>
-      <p class="section-subtitle">Pacelab combines AI, data, and messaging into one seamless coaching experience.</p>
-    </div>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">&#x1F4CA;</div>
-        <h3>Strava Integration</h3>
-        <p>Sync your workouts automatically. Pacelab analyzes your runs, rides, and swims from Strava to give you data-driven insights and adjust your training plan in real time.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">&#x1F9E0;</div>
-        <h3>AI-Generated Plans</h3>
-        <p>Get personalized training plans built by AI based on your fitness level, goals, and schedule. Plans adapt as you improve &mdash; no two weeks are the same.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">&#x1F4AC;</div>
-        <h3>Chat via Telegram</h3>
-        <p>No app to download. Coach is right in your Telegram inbox. Ask questions, get motivation, check your progress &mdash; it's like having a coach on chat 24/7.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== HOW IT WORKS ===== -->
-<section class="section" id="how">
-  <div class="container">
-    <div class="how-header">
-      <span class="section-label">How It Works</span>
-      <h2 class="section-title">Get started in 4 simple steps</h2>
-      <p class="section-subtitle">From zero to your first AI-powered workout in under 2 minutes.</p>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-number">1</div>
-        <h3>Open Telegram</h3>
-        <p>Tap the button below to open Pacelab on Telegram. No downloads, no sign-ups &mdash; just click and chat.</p>
-      </div>
-      <div class="step">
-        <div class="step-number">2</div>
-        <h3>Connect Strava</h3>
-        <p>Link your Strava account with one tap. Pacelab imports your activity history to understand your fitness baseline.</p>
-      </div>
-      <div class="step">
-        <div class="step-number">3</div>
-        <h3>Set Your Goals</h3>
-        <p>Tell the coach your goals &mdash; run a faster 5K, complete a marathon, or just stay consistent. AI builds your custom plan.</p>
-      </div>
-      <div class="step">
-        <div class="step-number">4</div>
-        <h3>Train &amp; Improve</h3>
-        <p>Follow your plan, log workouts via Strava, and chat with your coach for feedback, adjustments, and motivation.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== PREVIEW ===== -->
-<section class="section preview" id="preview">
-  <div class="container">
-    <div class="preview-header">
-      <span class="section-label">Preview</span>
-      <h2 class="section-title">See Pacelab in action</h2>
-      <p class="section-subtitle">Real conversations with your AI coach. Here's what to expect.</p>
-    </div>
-    <div class="preview-grid">
-      <div class="preview-card">
-        <div class="preview-card-img">
-          <div class="mock-chat">
-            <div class="mock-msg left"><span class="hl">Pacelab Coach:</span> Good morning! Ready for today's 8K tempo run? Target pace: 4:50/km.</div>
-            <div class="mock-msg right">Let's go! What's the warm-up?</div>
-            <div class="mock-msg left"><span class="hl">Pacelab Coach:</span> 10 min easy jog + 4 strides. Don't forget to hydrate!</div>
+          <div class="hero-facts">
+            <span>12 weeks of Strava history</span>
+            <span>7-day plans</span>
+            <span>No app install</span>
           </div>
         </div>
-        <div class="preview-card-body">
-          <h4>Daily Coaching</h4>
-          <p>Get daily workout instructions, pacing guidance, and warm-up routines delivered straight to your chat.</p>
-        </div>
+        <figure class="hero-figure">
+          <img src="img/track-aerial.jpg" width="1800" height="949" alt="Runners spread across the lanes of an outdoor track, seen from above">
+          <figcaption>
+            <span>Track session</span>
+            <span>Photo: Unsplash</span>
+          </figcaption>
+        </figure>
       </div>
-      <div class="preview-card">
-        <div class="preview-card-img">
-          <div class="mock-chat">
-            <div class="mock-msg left"><span class="hl">Pacelab Coach:</span> Great 10K run! Your cadence improved 3% from last week.</div>
-            <div class="mock-msg right">How's my endurance looking?</div>
-            <div class="mock-msg left"><span class="hl">Pacelab Coach:</span> Trending up! Your HR stayed 5 bpm lower at the same pace. Keep it up!</div>
+    </div>
+  </section>
+
+  <section class="section" id="week">
+    <div class="wrap">
+      <div class="week-grid">
+        <div class="week-aside">
+          <h2>One week, written from your Strava data.</h2>
+          <p class="section-intro">Every Sunday the coach looks at your last 12 weeks: weekly volume, longest run, easy pace, and how many sessions you actually finished. Then it writes the next seven days. Miss Tuesday and the intervals move to Wednesday instead of stacking two hard days.</p>
+          <figure class="week-photo">
+            <img src="img/runner-steps.jpg" width="1800" height="1200" alt="A runner in orange shoes climbing concrete steps during a session" loading="lazy">
+            <figcaption>Hill work</figcaption>
+          </figure>
+        </div>
+
+        <div class="week-plan">
+          <div class="week-list" role="list">
+            <div class="week-row" role="listitem">
+              <span class="week-day">Mon</span>
+              <span class="week-session">Easy run</span>
+              <span class="week-detail">8 km at 5:40/km</span>
+            </div>
+            <div class="week-row" role="listitem">
+              <span class="week-day">Tue</span>
+              <span class="week-session">Intervals</span>
+              <span class="week-detail">4 x 800 m at 4:20/km</span>
+            </div>
+            <div class="week-row week-rest" role="listitem">
+              <span class="week-day">Wed</span>
+              <span class="week-session">Rest</span>
+              <span class="week-detail">20 min mobility, optional</span>
+            </div>
+            <div class="week-row" role="listitem">
+              <span class="week-day">Thu</span>
+              <span class="week-session">Tempo run</span>
+              <span class="week-detail">6 km at 4:50/km</span>
+            </div>
+            <div class="week-row" role="listitem">
+              <span class="week-day">Fri</span>
+              <span class="week-session">Easy run</span>
+              <span class="week-detail">5 km at 5:45/km</span>
+            </div>
+            <div class="week-row" role="listitem">
+              <span class="week-day">Sat</span>
+              <span class="week-session">Long run</span>
+              <span class="week-detail">16 km at 5:50/km</span>
+            </div>
+            <div class="week-row week-rest" role="listitem">
+              <span class="week-day">Sun</span>
+              <span class="week-session">Rest</span>
+              <span class="week-detail">Full day off</span>
+            </div>
           </div>
-        </div>
-        <div class="preview-card-body">
-          <h4>Performance Insights</h4>
-          <p>Get real-time analysis of your workouts with trends, comparisons, and actionable feedback.</p>
+          <p class="week-note">Example week for a half marathon at 1:45. Your paces and volume come from your own Strava history, not from this page.</p>
         </div>
       </div>
-      <div class="preview-card">
-        <div class="preview-card-img">
-          <div class="mock-chat">
-            <div class="mock-msg left"><span class="hl">Pacelab Coach:</span> I noticed you've been consistent this month. Want me to adjust next week's plan?</div>
-            <div class="mock-msg right">Yes, increase volume by 10%</div>
-            <div class="mock-msg left"><span class="hl">Pacelab Coach:</span> Done! New plan: 55K total. Monday: rest, Tuesday: intervals&hellip;</div>
+    </div>
+  </section>
+
+  <section class="section" id="reads">
+    <div class="wrap">
+      <div class="reads-grid">
+        <div>
+          <h2>What it reads before it writes.</h2>
+          <p class="section-intro">No questionnaire at sign-up. Connect Strava once and the plan starts from the training you have already done.</p>
+        </div>
+        <div>
+          <dl class="reads-list">
+            <div class="reads-row">
+              <dt>Activities</dt>
+              <dd>Distance, pace, heart rate, elevation, and how often you run each week.</dd>
+            </div>
+            <div class="reads-row">
+              <dt>Training load</dt>
+              <dd>Four-week volume trend, longest recent run, and days since your last hard session.</dd>
+            </div>
+            <div class="reads-row">
+              <dt>Your goal</dt>
+              <dd>Race date, target time, and the weekdays you can actually train.</dd>
+            </div>
+          </dl>
+          <p class="reads-note">Starting from an empty Strava account? The first week is a 3 km test run plus easy sessions, and the plan builds from there.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pricing">
+    <div class="wrap">
+      <h2>Start free. Go Pro at $9.</h2>
+      <p class="section-intro">Both plans include a full seven-day plan. Pro keeps rewriting it as you train.</p>
+
+      <div class="pricing-grid">
+        <div class="plan">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">$0 <span>per month</span></div>
+          <p class="plan-desc">A seven-day plan each Sunday, plus chat replies for your first week.</p>
+          <ul class="plan-features">
+            <li><svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true"><path d="M1 5 L4.5 8.5 L11 1.5" stroke="currentColor" stroke-width="2"/></svg>Strava sync</li>
+            <li><svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true"><path d="M1 5 L4.5 8.5 L11 1.5" stroke="currentColor" stroke-width="2"/></svg>One 7-day plan</li>
+            <li><svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true"><path d="M1 5 L4.5 8.5 L11 1.5" stroke="currentColor" stroke-width="2"/></svg>Pace targets from your runs</li>
+            <li><svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true"><path d="M1 5 L4.5 8.5 L11 1.5" stroke="currentColor" stroke-width="2"/></svg>Chat with the coach</li>
+          </ul>
+          <a href="http://t.me/pacelab_bot" class="btn" target="_blank" rel="noopener">Start on Telegram</a>
+        </div>
+
+        <div class="plan">
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$9 <span>per month</span></div>
+          <p class="plan-desc">The full coach: a new week every week, race build-ups, and no limit on questions.</p>
+          <ul class="plan-features">
+            <li><svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true"><path d="M1 5 L4.5 8.5 L11 1.5" stroke="currentColor" stroke-width="2"/></svg>Everything in Free</li>
+            <li><svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true"><path d="M1 5 L4.5 8.5 L11 1.5" stroke="currentColor" stroke-width="2"/></svg>Plan rewritten every week</li>
+            <li><svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true"><path d="M1 5 L4.5 8.5 L11 1.5" stroke="currentColor" stroke-width="2"/></svg>Race build-ups from 5K to marathon</li>
+            <li><svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true"><path d="M1 5 L4.5 8.5 L11 1.5" stroke="currentColor" stroke-width="2"/></svg>Missed-session reshuffling</li>
+            <li><svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true"><path d="M1 5 L4.5 8.5 L11 1.5" stroke="currentColor" stroke-width="2"/></svg>Unlimited chat</li>
+          </ul>
+          <a href="http://t.me/pacelab_bot" class="btn" target="_blank" rel="noopener">Start on Telegram</a>
+        </div>
+      </div>
+      <p class="pricing-note">Billed monthly through Telegram. Tell the bot to cancel and it stops at the end of the current month.</p>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="faq-grid">
+        <div>
+          <h2>Questions runners ask before starting.</h2>
+        </div>
+        <div class="faq-list">
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What is CoachPace?
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1 V13 M1 7 H13" stroke="currentColor" stroke-width="1.6"/></svg>
+            </button>
+            <div class="faq-answer"><div><p>A running coach that works inside Telegram. It reads your Strava activities, writes a seven-day plan, and answers training questions in the same chat.</p></div></div>
           </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Do I need a Strava account?
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1 V13 M1 7 H13" stroke="currentColor" stroke-width="1.6"/></svg>
+            </button>
+            <div class="faq-answer"><div><p>For the full plan, yes. CoachPace uses your history to set paces and weekly volume. You can start with an empty account: the first week is a 3 km test run plus easy sessions.</p></div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Is there an app to download?
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1 V13 M1 7 H13" stroke="currentColor" stroke-width="1.6"/></svg>
+            </button>
+            <div class="faq-answer"><div><p>No. Open the bot in Telegram and the whole coach is there. Plans, edits, and questions all stay in one chat.</p></div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              How are the plans built?
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1 V13 M1 7 H13" stroke="currentColor" stroke-width="1.6"/></svg>
+            </button>
+            <div class="faq-answer"><div><p>From your last 12 weeks on Strava: weekly distance, longest run, pace at easy and threshold effort, and the days you train. The coach writes the coming week and adjusts it as new activities arrive.</p></div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What happens if I miss a session?
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1 V13 M1 7 H13" stroke="currentColor" stroke-width="1.6"/></svg>
+            </button>
+            <div class="faq-answer"><div><p>The coach moves the important session later in the week and drops the optional one. It does not put two hard days back to back.</p></div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Can I change my goal or training days?
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1 V13 M1 7 H13" stroke="currentColor" stroke-width="1.6"/></svg>
+            </button>
+            <div class="faq-answer"><div><p>Yes. Tell the coach the new race, target time, or days you can train, and it rewrites the remaining weeks.</p></div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Is my Strava data private?
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1 V13 M1 7 H13" stroke="currentColor" stroke-width="1.6"/></svg>
+            </button>
+            <div class="faq-answer"><div><p>Your activities are used to build your plan and are not sold or shared with third parties. Ask the bot to delete your account and it removes your data.</p></div></div>
+          </div>
+
         </div>
-        <div class="preview-card-body">
-          <h4>Adaptive Planning</h4>
-          <p>Your plan evolves with you. Miss a workout or crush a PR &mdash; the coach adapts your schedule accordingly.</p>
-        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ===== PRICING ===== -->
-<section class="section" id="pricing">
-  <div class="container">
-    <div class="pricing-header">
-      <span class="section-label">Pricing</span>
-      <h2 class="section-title">Simple, transparent pricing</h2>
-      <p class="section-subtitle">Start free, upgrade when you're ready for more.</p>
-    </div>
-    <div class="pricing-grid">
-      <div class="pricing-card">
-        <div class="pricing-name">Free</div>
-        <div class="pricing-price">$0 <span>/ month</span></div>
-        <p class="pricing-desc">Get started with basic AI coaching.</p>
-        <ul class="pricing-features">
-          <li><span class="check">&#10003;</span> Strava sync</li>
-          <li><span class="check">&#10003;</span> Weekly training plans</li>
-          <li><span class="check">&#10003;</span> Basic performance insights</li>
-          <li><span class="check">&#10003;</span> Chat coaching (limited)</li>
-        </ul>
-        <a href="http://t.me/pacelab_bot" class="btn btn-outline" target="_blank" rel="noopener">Get Started</a>
-      </div>
-      <div class="pricing-card featured">
-        <div class="pricing-badge">Most Popular</div>
-        <div class="pricing-name">Pro</div>
-        <div class="pricing-price">$9 <span>/ month</span></div>
-        <p class="pricing-desc">Unlock advanced coaching features.</p>
-        <ul class="pricing-features">
-          <li><span class="check">&#10003;</span> Everything in Free</li>
-          <li><span class="check">&#10003;</span> Personalized AI plans</li>
-          <li><span class="check">&#10003;</span> Unlimited chat coaching</li>
-          <li><span class="check">&#10003;</span> Advanced analytics & trends</li>
-          <li><span class="check">&#10003;</span> Goal-based plan adjustments</li>
-        </ul>
-        <a href="http://t.me/pacelab_bot" class="btn btn-primary" target="_blank" rel="noopener">Start Free Trial</a>
-      </div>
-      <div class="pricing-card">
-        <div class="pricing-name">Premium</div>
-        <div class="pricing-price">$19 <span>/ month</span></div>
-        <p class="pricing-desc">The ultimate coaching experience.</p>
-        <ul class="pricing-features">
-          <li><span class="check">&#10003;</span> Everything in Pro</li>
-          <li><span class="check">&#10003;</span> Priority AI responses</li>
-          <li><span class="check">&#10003;</span> Race preparation plans</li>
-          <li><span class="check">&#10003;</span> Nutrition & recovery tips</li>
-          <li><span class="check">&#10003;</span> Exclusive community access</li>
-        </ul>
-        <a href="http://t.me/pacelab_bot" class="btn btn-outline" target="_blank" rel="noopener">Go Premium</a>
-      </div>
-    </div>
-  </div>
-</section>
+</main>
 
-<!-- ===== FAQ ===== -->
-<section class="section" id="faq">
-  <div class="container">
-    <div class="faq-header">
-      <span class="section-label">FAQ</span>
-      <h2 class="section-title">Frequently asked questions</h2>
-      <p class="section-subtitle">Everything you need to know about Pacelab.</p>
-    </div>
-    <div class="faq-list">
-      <div class="faq-item">
-        <button class="faq-question">
-          What is Pacelab?
-          <span class="icon">+</span>
-        </button>
-        <div class="faq-answer"><p>Pacelab is an AI-powered training coach that lives inside Telegram. It creates personalized workout plans, syncs with your Strava account, and provides conversational coaching &mdash; all through a chat interface you already use every day.</p></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          How do I connect my Strava account?
-          <span class="icon">+</span>
-        </button>
-        <div class="faq-answer"><p>When you start Pacelab on Telegram, the bot will guide you through a simple one-tap Strava authorization. Your data is securely synced and used only to personalize your training plans.</p></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          Is there a mobile app to download?
-          <span class="icon">+</span>
-        </button>
-        <div class="faq-answer"><p>Nope! Pacelab works entirely inside Telegram. If you have Telegram installed, you're already set. Just open the bot and start chatting &mdash; no additional downloads or accounts needed.</p></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          How are the training plans generated?
-          <span class="icon">+</span>
-        </button>
-        <div class="faq-answer"><p>Plans are generated by our AI based on your fitness level (from Strava data), your goals, available training days, and performance feedback. The more you use Pacelab, the smarter and more personalized your plans become.</p></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          Can I change my goal or plan later?
-          <span class="icon">+</span>
-        </button>
-        <div class="faq-answer"><p>Absolutely. Just tell your coach you want to change goals. Whether you're recovering from an injury or training for a new race distance, Pacelab regenerates your plan on the fly.</p></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          Is my data private and secure?
-          <span class="icon">+</span>
-        </button>
-        <div class="faq-answer"><p>Yes. Your Strava data and chat history are encrypted and never shared with third parties. You can delete your data at any time by asking the bot. We take privacy seriously.</p></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== FOOTER ===== -->
 <footer class="footer">
-  <div class="container">
-    <div class="footer-content">
-      <div class="footer-logo">
-        <img src="https://raw.githubusercontent.com/sruizcarmona/pacelab-web/201929e0f4a892942cd6bc28caf40cd5bb256078/logo_pacelab.png" alt="Pacelab">
-        Pacelab
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="brand">
+          <svg width="26" height="24" viewBox="0 0 30 28" fill="none" aria-hidden="true">
+            <path d="M1 2 L12 14 L1 26" stroke="currentColor" stroke-width="2"/>
+            <path d="M10 2 L21 14 L10 26" stroke="currentColor" stroke-width="2.8"/>
+            <path d="M19 2 L30 14 L19 26" stroke="#b23a13" stroke-width="3.6"/>
+          </svg>
+          CoachPace
+        </a>
+        <p>An AI running coach for Telegram. Reads Strava, writes the week, adjusts when you miss a day.</p>
       </div>
       <div class="footer-links">
-        <a href="#features">Features</a>
+        <a href="#week">The week</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
         <a href="http://t.me/pacelab_bot" target="_blank" rel="noopener">Telegram</a>
       </div>
-      <div class="footer-copy">&copy; 2026 Pacelab</div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 CoachPace</span>
+      <span>Photos from Unsplash</span>
     </div>
   </div>
 </footer>
 
 <script>
-  // Navbar scroll effect
   const navbar = document.getElementById('navbar');
   const navToggle = document.getElementById('navToggle');
   const navLinks = document.getElementById('navLinks');
 
-  let lastScroll = 0;
-  window.addEventListener('scroll', () => {
-    const current = window.scrollY;
-    navbar.classList.toggle('scrolled', current > 50);
-    lastScroll = current;
-  }, { passive: true });
+  const onScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 8);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 
-  // Mobile nav toggle
   navToggle.addEventListener('click', () => {
-    navToggle.classList.toggle('open');
-    navLinks.classList.toggle('open');
+    const open = navLinks.classList.toggle('open');
+    navToggle.classList.toggle('open', open);
+    navToggle.setAttribute('aria-expanded', String(open));
   });
 
-  // Close mobile nav on link click
-  navLinks.querySelectorAll('a:not(.nav-cta)').forEach(link => {
+  navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
-      navToggle.classList.remove('open');
       navLinks.classList.remove('open');
+      navToggle.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
     });
   });
 
-  // FAQ accordion
   document.querySelectorAll('.faq-question').forEach(btn => {
     btn.addEventListener('click', () => {
       const item = btn.parentElement;
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
-      if (!isOpen) item.classList.add('open');
+      const willOpen = !item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(el => {
+        el.classList.remove('open');
+        el.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        el.querySelector('.faq-answer').setAttribute('aria-hidden', 'true');
+      });
+      if (willOpen) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+        item.querySelector('.faq-answer').setAttribute('aria-hidden', 'false');
+      }
     });
   });
+
+  document.querySelectorAll('.faq-answer').forEach(a => a.setAttribute('aria-hidden', 'true'));
 </script>
 </body>
 </html>
