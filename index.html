@@ -7,7 +7,7 @@
 <meta name="description" content="CoachPace reads your Strava activities, writes a seven-day running plan, and adjusts it in Telegram when you miss a session. Free to start, Pro at $9 per month.">
 <meta property="og:title" content="CoachPace: AI running coach on Telegram">
 <meta property="og:description" content="Reads your Strava runs, writes the next seven days, and rewrites the week when you miss a session.">
-<meta property="og:image" content="https://raw.githubusercontent.com/sruizcarmona/coachpace-web/main/logo_coachpace.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/sruizcarmona/coachpace-web/main/logo_coachpace_hd.png">
 <meta property="og:type" content="website">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#f4f1ea">
@@ -96,7 +96,7 @@
     font-family: "Bricolage Grotesque", Georgia, serif;
     font-size: 1.32rem; font-weight: 700; letter-spacing: -0.03em;
   }
-  .brand img { display: block; width: 34px; height: 34px; flex-shrink: 0; }
+  .brand svg { flex-shrink: 0; }
   .nav-links { display: flex; align-items: center; gap: 30px; }
   .nav-links a {
     font-size: .94rem; font-weight: 500; color: var(--ink-soft);
@@ -128,7 +128,7 @@
 
   /* ===== HERO ===== */
   .hero { padding: 76px 0 96px; }
-  .hero-logo { width: 64px; height: 64px; margin-bottom: 28px; }
+  .hero-logo { width: 72px; height: 72px; margin-bottom: 26px; }
   .hero-grid {
     display: grid; grid-template-columns: 1.05fr .95fr;
     gap: clamp(32px, 6vw, 76px); align-items: center;
@@ -286,7 +286,7 @@
     margin-top: 12px; max-width: 34ch;
     font-size: .9rem; color: var(--ink-faint);
   }
-  .footer-brand .brand img { width: 28px; height: 28px; }
+  .footer-brand .brand svg { width: 28px; height: 28px; }
   .footer-links { display: flex; gap: 26px; flex-wrap: wrap; align-items: flex-start; }
   .footer-links a {
     font-size: .9rem; color: var(--ink-soft);
@@ -358,7 +358,11 @@
 <nav class="navbar" id="navbar">
   <div class="wrap">
     <a href="#" class="brand" aria-label="CoachPace home">
-      <img src="logo_mark.png" alt="" width="192" height="192">
+      <svg width="34" height="34" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <path d="M7 10 L13 20 L7 30" stroke="currentColor" stroke-width="2.2"/>
+        <path d="M17 10 L23 20 L17 30" stroke="currentColor" stroke-width="2.8"/>
+        <path d="M27 10 L33 20 L27 30" stroke="#b23a13" stroke-width="3.4"/>
+      </svg>
       CoachPace
     </a>
     <div class="nav-links" id="navLinks">
@@ -379,7 +383,11 @@
     <div class="wrap">
       <div class="hero-grid">
         <div class="hero-copy">
-          <img src="logo_mark.png" class="hero-logo" alt="CoachPace logo" width="192" height="192">
+          <svg class="hero-logo" width="72" height="72" viewBox="0 0 40 40" fill="none" role="img" aria-label="CoachPace logo">
+            <path d="M7 10 L13 20 L7 30" stroke="#16150f" stroke-width="2.2"/>
+            <path d="M17 10 L23 20 L17 30" stroke="#16150f" stroke-width="2.8"/>
+            <path d="M27 10 L33 20 L27 30" stroke="#b23a13" stroke-width="3.4"/>
+          </svg>
           <h1>Turn your Strava runs into next week’s plan.</h1>
           <p class="hero-sub">CoachPace reads the activities you already log, writes your next seven days session by session, and rewrites the week when life gets in the way. It lives in Telegram, so there is nothing to install.</p>
           <div class="hero-actions">
@@ -600,7 +608,11 @@
     <div class="footer-top">
       <div class="footer-brand">
         <a href="#" class="brand">
-          <img src="logo_mark.png" alt="" width="192" height="192">
+          <svg width="30" height="30" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+            <path d="M7 10 L13 20 L7 30" stroke="currentColor" stroke-width="2.2"/>
+            <path d="M17 10 L23 20 L17 30" stroke="currentColor" stroke-width="2.8"/>
+            <path d="M27 10 L33 20 L27 30" stroke="#b23a13" stroke-width="3.4"/>
+          </svg>
           CoachPace
         </a>
         <p>An AI running coach for Telegram. Reads Strava, writes the week, adjusts when you miss a day.</p>

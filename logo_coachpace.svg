@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="cp-title">
+  <title id="cp-title">CoachPace</title>
+  <g transform="translate(53 56) scale(10)" fill="none" stroke-linecap="butt" stroke-linejoin="miter">
+    <path d="M7 10 L13 20 L7 30" stroke="#16150f" stroke-width="2.2"/>
+    <path d="M17 10 L23 20 L17 30" stroke="#16150f" stroke-width="2.8"/>
+    <path d="M27 10 L33 20 L27 30" stroke="#b23a13" stroke-width="3.4"/>
+  </g>
+</svg>

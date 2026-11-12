@@ -15,8 +15,9 @@ python3 -m http.server 8000
 ## Structure
 
 - `index.html` - the whole site (markup, styles, and the FAQ/nav script)
-- `logo_coachpace.png` - master logo, used for social previews
-- `logo_mark.png` - 192 px logo mark used in the nav, hero and footer
+- `logo_coachpace.svg` - vector logo mark, transparent background
+- `logo_coachpace_hd.png` - 1024 x 1024 PNG on the paper background, used for
+  the Telegram bot avatar and social previews
 - `favicon.png` - 256 px favicon
 - `img/track-aerial.jpg`, `img/runner-steps.jpg` - section imagery
 
