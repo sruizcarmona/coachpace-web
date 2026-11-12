@@ -96,7 +96,7 @@
     font-family: "Bricolage Grotesque", Georgia, serif;
     font-size: 1.32rem; font-weight: 700; letter-spacing: -0.03em;
   }
-  .brand svg { flex-shrink: 0; }
+  .brand img { display: block; width: 34px; height: 34px; flex-shrink: 0; }
   .nav-links { display: flex; align-items: center; gap: 30px; }
   .nav-links a {
     font-size: .94rem; font-weight: 500; color: var(--ink-soft);
@@ -128,6 +128,7 @@
 
   /* ===== HERO ===== */
   .hero { padding: 76px 0 96px; }
+  .hero-logo { width: 64px; height: 64px; margin-bottom: 28px; }
   .hero-grid {
     display: grid; grid-template-columns: 1.05fr .95fr;
     gap: clamp(32px, 6vw, 76px); align-items: center;
@@ -285,6 +286,7 @@
     margin-top: 12px; max-width: 34ch;
     font-size: .9rem; color: var(--ink-faint);
   }
+  .footer-brand .brand img { width: 28px; height: 28px; }
   .footer-links { display: flex; gap: 26px; flex-wrap: wrap; align-items: flex-start; }
   .footer-links a {
     font-size: .9rem; color: var(--ink-soft);
@@ -356,11 +358,7 @@
 <nav class="navbar" id="navbar">
   <div class="wrap">
     <a href="#" class="brand" aria-label="CoachPace home">
-      <svg width="30" height="28" viewBox="0 0 30 28" fill="none" aria-hidden="true">
-        <path d="M1 2 L12 14 L1 26" stroke="currentColor" stroke-width="2"/>
-        <path d="M10 2 L21 14 L10 26" stroke="currentColor" stroke-width="2.8"/>
-        <path d="M19 2 L30 14 L19 26" stroke="#b23a13" stroke-width="3.6"/>
-      </svg>
+      <img src="logo_mark.png" alt="" width="192" height="192">
       CoachPace
     </a>
     <div class="nav-links" id="navLinks">
@@ -381,6 +379,7 @@
     <div class="wrap">
       <div class="hero-grid">
         <div class="hero-copy">
+          <img src="logo_mark.png" class="hero-logo" alt="CoachPace logo" width="192" height="192">
           <h1>Turn your Strava runs into next week’s plan.</h1>
           <p class="hero-sub">CoachPace reads the activities you already log, writes your next seven days session by session, and rewrites the week when life gets in the way. It lives in Telegram, so there is nothing to install.</p>
           <div class="hero-actions">
@@ -601,11 +600,7 @@
     <div class="footer-top">
       <div class="footer-brand">
         <a href="#" class="brand">
-          <svg width="26" height="24" viewBox="0 0 30 28" fill="none" aria-hidden="true">
-            <path d="M1 2 L12 14 L1 26" stroke="currentColor" stroke-width="2"/>
-            <path d="M10 2 L21 14 L10 26" stroke="currentColor" stroke-width="2.8"/>
-            <path d="M19 2 L30 14 L19 26" stroke="#b23a13" stroke-width="3.6"/>
-          </svg>
+          <img src="logo_mark.png" alt="" width="192" height="192">
           CoachPace
         </a>
         <p>An AI running coach for Telegram. Reads Strava, writes the week, adjusts when you miss a day.</p>

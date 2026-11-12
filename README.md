@@ -15,7 +15,8 @@ python3 -m http.server 8000
 ## Structure
 
 - `index.html` - the whole site (markup, styles, and the FAQ/nav script)
-- `logo_coachpace.png` - social preview image
+- `logo_coachpace.png` - master logo, used for social previews
+- `logo_mark.png` - 192 px logo mark used in the nav, hero and footer
 - `favicon.png` - 256 px favicon
 - `img/track-aerial.jpg`, `img/runner-steps.jpg` - section imagery
 
