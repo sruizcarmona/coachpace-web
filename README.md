@@ -6,11 +6,7 @@ week when a session is missed.
 
 ## Run locally
 
-No build step. Open `index.html`, or serve the folder:
-
-```sh
-python3 -m http.server 8000
-```
+No build step. Open `index.html`.
 
 ## Structure
 
